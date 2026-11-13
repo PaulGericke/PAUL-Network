@@ -1,0 +1,19 @@
+[Unit]
+Description=PAUL local router Internet fallback hotspot
+Requires=NetworkManager.service
+After=NetworkManager.service docker.service
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/paul-node/wifi_service.py
+ExecStopPost=/usr/bin/python3 /opt/paul-node/wifi_service.py recover
+UMask=0077
+TimeoutStopSec=90
+KillMode=control-group
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

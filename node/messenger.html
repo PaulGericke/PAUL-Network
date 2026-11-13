@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAUL · Messenger</title>
+<style>
+:root{color-scheme:dark;--bg:#101718;--panel:#172223;--line:#304041;--muted:#a7b8b6;--mint:#b9f0cb;--ink:#edf5ef}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.4;cursor:default}
+button,input,textarea,select{border-radius:12px;border:1px solid var(--line)}input,textarea,select{background:#101b1c;color:var(--ink);padding:12px}
+button{background:var(--mint);color:#112a1c;padding:11px 18px;font-weight:650}button.ghost{background:transparent;color:var(--ink);padding:7px 11px;font-size:13px}
+.shell{max-width:1180px;margin:0 auto;padding:30px 24px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}.topActions{display:flex;align-items:center;gap:8px}.brand{font-weight:800;letter-spacing:.16em;font-size:21px}
+.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}h1{margin:6px 0 12px;font-size:36px;letter-spacing:-.04em}h2{font-size:19px;margin:0}
+.grid{display:grid;grid-template-columns:290px minmax(0,1fr);gap:20px}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px}.muted{color:var(--muted);font-size:13px}.big{font-size:27px;font-weight:650}
+.metric{padding:18px 0;border-bottom:1px solid var(--line)}.metric:last-child{border-bottom:0}.pill{display:inline-block;border:1px solid var(--line);border-radius:30px;padding:5px 12px;font-size:12px;color:var(--mint)}
+.chat{display:flex;flex-direction:column;min-height:570px}.chathead{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.peerPicker{display:grid;gap:7px;min-width:300px}.peerPicker label{font-size:11px;color:var(--muted)}#peerSelect,#peer{width:100%}.peerOr{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);text-align:center}
+#messages{flex:1;max-height:460px;min-height:210px;overflow:auto;padding:20px 2px}.message{max-width:85%;border:1px solid var(--line);background:#223334;border-radius:16px 16px 16px 4px;padding:13px 16px;margin:0 auto 14px 0}.message.out{margin-left:auto;margin-right:0;background:#243c30;border-color:#3c5844;border-radius:16px 16px 4px 16px}.message p{white-space:pre-wrap;overflow-wrap:anywhere;margin:7px 0 10px}.meta{font-size:11px;color:var(--muted)}.status{font-size:12px;color:#d6e9db}.status.delivered{color:#b4fac8}.status.failed,.status.unconfirmed{color:#f2cd92}.actions{margin-top:9px}.actions button{margin-right:6px}
+#empty{text-align:center;padding:50px 18px;color:var(--muted)}textarea{display:block;width:100%;resize:vertical;min-height:84px}.composerbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px}.note{font-size:12px;color:var(--muted);margin:14px 0 0}.error{color:#ffc5ae;margin:12px 0;min-height:20px;font-size:13px}.login{max-width:430px;margin:7vh auto}.login input{width:100%;margin:16px 0}.login button{width:100%}[hidden]{display:none!important}a{color:var(--mint)}.footer{margin-top:20px;font-size:11px;color:var(--muted)}
+.langSwitch{display:flex;gap:4px;border:1px solid var(--line);border-radius:12px;padding:3px}.langSwitch button{background:transparent;color:var(--muted);border:0;padding:4px 8px;border-radius:8px;font-size:11px}.langSwitch button.active{background:var(--mint);color:#112a1c}
+@media(max-width:750px){.shell{padding:20px 14px}.grid{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:14px}.side .identity{grid-column:1/-1}.metric{padding:5px 0;border:0}.side .note{grid-column:1/-1}h1{font-size:29px}.chat{min-height:480px}.card{padding:17px}.top{margin-bottom:20px}.message{max-width:94%}.chathead{display:grid}.peerPicker{min-width:0;width:100%}.topActions{flex-wrap:wrap;justify-content:flex-end}}
+</style>
+<style id="paul-messenger-new-chat-20260929">#newChat{margin-top:9px;width:100%}#sendHint{min-height:20px;margin-top:10px}</style></head>
+<body>
+<main class="shell">
+<header class="top">
+  <div class="brand">PAUL<span style="color:var(--mint)">.</span></div>
+  <div class="topActions">
+    <div class="eyebrow" data-i18n="headerTag">Messenger · Direkt über LoRa</div>
+    <div class="langSwitch" aria-label="Language">
+      <button id="langDe" type="button">DE</button><button id="langEn" type="button">EN</button>
+    </div>
+    <button id="logout" class="ghost" hidden data-i18n="logout">Abmelden</button>
+  </div>
+</header>
+<section id="login" class="card login">
+  <span class="eyebrow" data-i18n="loginEyebrow">Dein lokaler Messenger</span>
+  <h1 data-i18n="loginTitle">Verbindung beginnt hier.</h1>
+  <p class="muted" data-i18n="loginText">Melde dich mit dem Zugangscode dieses Geräts an. Deine Nachrichten werden auf dem Gerät gespeichert.</p>
+  <form id="loginform">
+    <label for="token" data-i18n="accessCode">Geräte-Zugangscode</label>
+    <input id="token" type="password" autocomplete="current-password" required data-i18n-placeholder="accessPlaceholder" placeholder="Zugangscode eingeben">
+    <button data-i18n="openMessenger">Messenger öffnen</button>
+  </form>
+  <p id="loginerror" class="error" role="alert"></p>
+  <p class="note" data-i18n="codeHint">Den Code findest du auch in PAUL Network unter My Network → Manage.</p>
+</section>
+<section id="app" hidden>
+  <div class="eyebrow">Public Autonomous Uplink Layer</div>
+  <h1 data-i18n="hero">Eine Nachricht. Direkt per Funk.</h1>
+  <div class="grid">
+    <aside class="card side">
+      <div class="identity"><div class="eyebrow" data-i18n="connectedTo">Du bist verbunden mit</div><div id="name" class="big"></div><div id="nodeid" class="muted"></div></div>
+      <div class="metric"><div class="muted" data-i18n="localRadio">Lokaler Funkzugang</div><div id="gateway">Wird geprüft …</div></div>
+      <div class="metric"><div class="muted" data-i18n="nextWindow">Nächstes Sendefenster</div><div id="countdown" class="big">—</div><div id="queue" class="muted"></div></div>
+      <p class="note" data-i18n="radioNote">v4.2 nutzt ein dynamisches Funkbudget. PAUL-Beacons senden standardmäßig ebenfalls im schnellen SF7-Modus, damit ein Beacon den Messenger nicht mehr minutenlang blockiert; Empfang bleibt jederzeit möglich.</p>
+      <p id="radioinfo" class="note"></p>
+    </aside>
+    <section class="card chat">
+      <div class="chathead">
+        <div><h2 id="title">Unterhaltung</h2><div class="muted" data-i18n="deliveryHint">Zustellung erst nach Funkbestätigung</div></div>
+        <div class="peerPicker">
+          <label for="peerSelect" data-i18n="choosePeer">Gateway / Node auswählen</label>
+          <select id="peerSelect" aria-label="Gateway / Node auswählen"><option value="" data-i18n="choosePlaceholder">Gateway / Node auswählen …</option></select>
+          <div class="peerOr" data-i18n="orManual">oder manuell</div>
+          <input id="peer" inputmode="text" pattern="[0-9a-fA-F]{16}" maxlength="16" autocomplete="off" autocapitalize="none" spellcheck="false" data-i18n-placeholder="peerPlaceholder" placeholder="Node-ID eingeben" aria-label="Empfänger">
+        <button type="button" id="newChat" class="ghost" data-i18n="newChat">Neuer Chat</button>
+        </div>
+      </div>
+      <div id="messages" aria-live="polite"><div id="empty">Noch keine Nachrichten.<br>Schreib die erste kurze Nachricht.</div></div>
+      <form id="compose">
+        <label class="muted" for="text" data-i18n="messageLabel">Nachricht</label>
+        <textarea id="text" data-i18n-placeholder="messagePlaceholder" placeholder="Was möchtest du sagen?" required></textarea>
+        <div class="composerbar"><span id="counter" class="muted">0 / 120 Bytes</span><button id="send" data-i18n="send">Senden</button></div>
+      </form>
+      <div id="sendHint" class="muted" aria-live="polite"></div><div id="error" class="error" role="alert"></div>
+      <p class="note" data-i18n="testNote">v1.0.1 · Ende-zu-Ende-verschlüsselt (X25519 + ChaCha20-Poly1305), auch ohne Internet. Pro Nachricht laufen automatisch bis zu drei Funkversuche. Eine späte gültige Bestätigung wird weiterhin angenommen.</p>
+    </section>
+  </div>
+  <div class="footer" id="fresh">Aktualisierung …</div>
+</section>
+</main>
+<script>
+let token=sessionStorage.getItem('paul-messenger-token')||'',model=null,fingerprint='',busy=false,offset=0;
+let lang=localStorage.getItem('paul-messenger-lang')||((navigator.language||'').toLowerCase().startsWith('de')?'de':'en');
+const $=id=>document.getElementById(id);
+const I18N={
+ de:{headerTag:'Messenger · Direkt über LoRa',logout:'Abmelden',loginEyebrow:'Dein lokaler Messenger',loginTitle:'Verbindung beginnt hier.',loginText:'Melde dich mit dem Zugangscode dieses Geräts an. Deine Nachrichten werden auf dem Gerät gespeichert.',accessCode:'Geräte-Zugangscode',accessPlaceholder:'Zugangscode eingeben',openMessenger:'Messenger öffnen',codeHint:'Den Code findest du auch in PAUL Network unter My Network → Manage.',hero:'Eine Nachricht. Direkt per Funk.',connectedTo:'Du bist verbunden mit',localRadio:'Lokaler Funkzugang',checking:'Wird geprüft …',nextWindow:'Nächstes Sendefenster',radioNote:'v4.2 nutzt ein dynamisches Funkbudget. PAUL-Beacons senden standardmäßig ebenfalls im schnellen SF7-Modus, damit ein Beacon den Messenger nicht mehr minutenlang blockiert; Empfang bleibt jederzeit möglich.',deliveryHint:'Zustellung erst nach Funkbestätigung',choosePeer:'Gateway / Node auswählen',choosePlaceholder:'Gateway / Node auswählen …',orManual:'oder manuell',peerPlaceholder:'Node-ID eingeben',conversation:'Unterhaltung',to:'An',empty:'Noch keine Nachrichten. Schreib die erste kurze Nachricht.',messageLabel:'Nachricht',messagePlaceholder:'Was möchtest du sagen?',send:'Senden',newChat:'Neuer Chat',enterNode:'Bitte eine 16-stellige Node-ID wählen oder eingeben.',enterText:'Bitte eine Nachricht schreiben.',tooLong:'Nachricht zu lang.',selfNode:'Das ist die ID dieses Gateways.',queuedOffline:'Nachricht wird lokal gespeichert und bei verfügbarem Funkzugang gesendet.',testNote:'v1.0.1 · Ende-zu-Ende-verschlüsselt (X25519 + ChaCha20-Poly1305), auch ohne Internet. Pro Nachricht laufen automatisch bis zu drei Funkversuche. Eine späte gültige Bestätigung wird weiterhin angenommen.',ready:'Bereit',queueOne:'Nachricht wartet',queueMany:'Nachrichten warten',ackPriority:'Bestätigung hat Vorrang',nodeNoReply:'Node antwortet nicht',connected:'Verbunden',waitForwarder:'Warte auf Packet Forwarder',compact:'Schnellmodus',robust:'Robustmodus',encrypted:'Verschlüsselt',waitKey:'Wartet auf Schlüssel des Empfängers (kommt mit seinem Funk-Beacon)',attempt:'Versuch',ackWaiting:'Funkbestätigung wartet auf Sendefenster',radioError:'Funkmeldung',cancel:'Abbrechen',retry:'Erneut versuchen',you:'Du',saved:'Lokal gespeichert · Zuletzt aktualisiert',noConnection:'Keine Verbindung zum Gerät',requestFailed:'Anfrage fehlgeschlagen',status:{queued:'Wartet auf Sendefenster',sent:'An Funkzugang übergeben · unbestätigt',air_accepted:'Funkzugang hat angenommen · unbestätigt',received:'Auf diesem Gerät empfangen',delivered:'Vom Zielgerät bestätigt',failed:'Funkzugang meldet einen Fehler',unconfirmed:'3 Versuche ohne Bestätigung · Zustellung unbekannt',cancelled:'Aus Warteschlange entfernt'}},
+ en:{headerTag:'Messenger · Direct over LoRa',logout:'Log out',loginEyebrow:'Your local messenger',loginTitle:'Connection starts here.',loginText:'Sign in with this device’s access code. Your messages are stored on the device.',accessCode:'Device access code',accessPlaceholder:'Enter access code',openMessenger:'Open Messenger',codeHint:'You can also find the code in PAUL Network under My Network → Manage.',hero:'One message. Direct over radio.',connectedTo:'You are connected to',localRadio:'Local radio access',checking:'Checking …',nextWindow:'Next transmit window',radioNote:'v4.2 uses a dynamic radio budget. PAUL beacons also use the fast SF7 mode by default, so a beacon no longer blocks the messenger for minutes; receiving remains available at all times.',deliveryHint:'Delivery only after radio acknowledgement',choosePeer:'Choose gateway / node',choosePlaceholder:'Choose gateway / node …',orManual:'or enter manually',peerPlaceholder:'Enter Node ID',conversation:'Conversation',to:'To',empty:'No messages yet. Send the first short message.',messageLabel:'Message',messagePlaceholder:'What would you like to say?',send:'Send',newChat:'New chat',enterNode:'Choose or enter a 16-digit Node ID.',enterText:'Write a message.',tooLong:'Message too long.',selfNode:'This is this gateway’s own ID.',queuedOffline:'Message is saved locally and transmitted when the radio is available.',testNote:'v1.0.1 · End-to-end encrypted (X25519 + ChaCha20-Poly1305), works without Internet. Each message automatically gets up to three radio attempts. A late valid acknowledgement is still accepted.',ready:'Ready',queueOne:'message waiting',queueMany:'messages waiting',ackPriority:'acknowledgement has priority',nodeNoReply:'Node is not responding',connected:'Connected',waitForwarder:'Waiting for packet forwarder',compact:'Fast mode',robust:'Robust mode',encrypted:'Encrypted',waitKey:'Waiting for the recipient’s key (arrives with its radio beacon)',attempt:'Attempt',ackWaiting:'Radio acknowledgement is waiting for a transmit window',radioError:'Radio message',cancel:'Cancel',retry:'Try again',you:'You',saved:'Stored locally · Last updated',noConnection:'No connection to device',requestFailed:'Request failed',status:{queued:'Waiting for transmit window',sent:'Passed to radio access · unconfirmed',air_accepted:'Radio access accepted · unconfirmed',received:'Received on this device',delivered:'Confirmed by destination device',failed:'Radio access reported an error',unconfirmed:'3 attempts without acknowledgement · delivery unknown',cancelled:'Removed from queue'}}
+};
+function t(k){return I18N[lang][k]??k}
+function applyLanguage(){document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(e=>{const v=t(e.dataset.i18n);if(typeof v==='string')e.textContent=v});document.querySelectorAll('[data-i18n-placeholder]').forEach(e=>e.placeholder=t(e.dataset.i18nPlaceholder));$('langDe').classList.toggle('active',lang==='de');$('langEn').classList.toggle('active',lang==='en');if(model){render();tick();renderPeerOptions();$('fresh').textContent=t('saved')+' '+new Date().toLocaleTimeString(lang==='de'?'de-DE':'en-GB')}}
+function setLanguage(next){lang=next;localStorage.setItem('paul-messenger-lang',lang);applyLanguage()}
+function translateError(msg){if(lang==='de')return msg;const map={'Bitte den Geräte-Zugangscode eingeben.':'Please enter the device access code.','Nicht gefunden':'Not found','Ungültiger Ursprung':'Invalid origin','JSON erforderlich':'JSON required','Ungültige Anfragegröße':'Invalid request size','Gültige Empfänger-Node-ID erforderlich':'A valid recipient Node ID is required','Bitte eine Nachricht eingeben':'Please enter a message','Warteschlange voll: maximal zehn Nachrichten':'Queue full: maximum ten messages','Ungültige Nachrichten-ID':'Invalid message ID','Status bereits geändert. Ansicht wird aktualisiert.':'Status already changed. Refreshing the view.'};if(map[msg])return map[msg];const m=msg.match(/^Maximal (\d+) UTF-8-Bytes pro Nachricht$/);if(m)return `Maximum ${m[1]} UTF-8 bytes per message`;return msg}
+async function api(path,body){const res=await fetch(path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(7000)});const obj=await res.json();if(!res.ok){if(res.status===401)lock();throw Error(translateError(obj.error||t('requestFailed')))}return obj}
+function lock(){sessionStorage.removeItem('paul-messenger-token');$('app').hidden=true;$('logout').hidden=true;$('login').hidden=false}
+function element(tag,text,cls){let e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
+function currentPeer(){return $('peer').value.trim().toLowerCase()}
+function rememberPeer(){const peer=currentPeer();sessionStorage.setItem('paul-messenger-peer',peer)}
+function syncSelect(){const peer=currentPeer();$('peerSelect').value=Object.prototype.hasOwnProperty.call(model?.contacts||{},peer)?peer:''}
+function renderPeerOptions(){const select=$('peerSelect'),placeholder=select.querySelector('option[value=""]')||document.createElement('option');select.replaceChildren();placeholder.value='';placeholder.textContent=t('choosePlaceholder');select.append(placeholder);if(!model)return;for(const [id,name] of Object.entries(model.contacts).filter(([id])=>id!==model.node)){const opt=document.createElement('option');opt.value=id;opt.textContent=name===id?id:(name+' · '+id);select.append(opt)}syncSelect()}
+function render(){const peer=currentPeer(),contact=model.contacts[peer]||peer;$('title').textContent=peer?t('to')+' '+contact:t('conversation');const list=model.messages.filter(x=>x.peer===peer),fp=JSON.stringify([lang,peer,list]);if(fp!==fingerprint){const box=$('messages'),atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.replaceChildren();if(!list.length){const e=element('div',t('empty'));e.id='empty';box.append(e)}for(const m of list){let e=element('article',undefined,'message '+m.direction);e.append(element('div',(m.direction==='out'?t('you'):contact)+' · '+new Date(m.created*1000).toLocaleTimeString(lang==='de'?'de-DE':'en-GB',{hour:'2-digit',minute:'2-digit'}),'meta'),element('p',m.text),element('div',t('status')[m.status]||m.status,'status '+m.status));if(m.direction==='out'&&m.attempts){const mode=m.mode==='encrypted'?t('encrypted'):m.mode==='compact'?t('compact'):t('robust');e.append(element('div',mode+' · '+t('attempt')+' '+m.attempts+'/'+(model.max_attempts||3)+(m.datr?' · '+m.datr:''),'meta'))}if(m.direction==='out'&&m.status==='queued'&&!m.peer_key)e.append(element('div',t('waitKey'),'meta'));if(m.direction==='in'&&m.ack_status==='queued')e.append(element('div',t('ackWaiting'),'meta'));if(m.error)e.append(element('div',t('radioError')+': '+m.error,'meta'));if(m.direction==='out'){const a=element('div',undefined,'actions'),action=m.status==='queued'?'cancel':(['unconfirmed','cancelled'].includes(m.status)?'retry':null);if(action){const b=element('button',action==='cancel'?t('cancel'):t('retry'),'ghost');b.type='button';b.onclick=async()=>{b.disabled=true;try{await api('/api/'+action,{peer:m.peer,id:m.id});await refresh()}catch(err){$('error').textContent=err.message;b.disabled=false}};a.append(b);e.append(a)}}box.append(e)}if(atBottom||!fingerprint)box.scrollTop=box.scrollHeight;fingerprint=fp}tick()}
+function tick(){if(!model)return;const r=model.radio,n=Date.now()/1000+offset,seconds=Math.max(0,Math.ceil((r.next_at||n)-n));$('countdown').textContent=seconds?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):t('ready');const queued=model.messages.filter(m=>m.direction==='out'&&m.status==='queued').length;$('queue').textContent=queued+' '+(queued===1?t('queueOne'):t('queueMany'))+(r.ack_pending?' · '+t('ackPriority'):'');const alive=r.loop_healthy&&n-(r.loop_at||0)<15,gw=r.gateway_connected&&n-(r.last_pull||0)<120;$('gateway').textContent=!alive?t('nodeNoReply'):gw?t('connected'):t('waitForwarder');const bytes=new TextEncoder().encode($('text').value).length,max=model.max_bytes||120,fast=model.fast_bytes||32,peer=currentPeer(),peerOk=/^[0-9a-f]{16}$/.test(peer)&&peer!==model.node;$('send').disabled=busy||!peerOk||bytes>max||!$('text').value.trim();$('sendHint').textContent=!peerOk?(peer===model.node?t('selfNode'):t('enterNode')):!$('text').value.trim()?t('enterText'):bytes>max?t('tooLong'):!alive?t('queuedOffline'):'';const mode=!bytes?'':' · '+t('encrypted');$('counter').textContent=bytes+' / '+max+' Bytes'+mode}
+async function refresh(){try{model=await api('/api/state');offset=model.server_time-Date.now()/1000;$('login').hidden=true;$('app').hidden=false;$('logout').hidden=false;sessionStorage.setItem('paul-messenger-token',token);$('name').textContent=model.name;$('nodeid').textContent=model.node;$('radioinfo').textContent=model.radio.frequency+' MHz · Messenger '+(lang==='de'?'verschlüsselt':'encrypted')+(model.radio.datr?' · '+(lang==='de'?'zuletzt ':'last ')+model.radio.datr:'')+(model.radio.beacon_datr?' · Beacon '+model.radio.beacon_datr:'');renderPeerOptions();render();$('fresh').textContent=t('saved')+' '+new Date().toLocaleTimeString(lang==='de'?'de-DE':'en-GB')}catch(err){if($('app').hidden)$('loginerror').textContent=err.message;else{$('fresh').textContent=t('noConnection')+' · '+err.message;$('send').disabled=true}}}
+$('loginform').onsubmit=e=>{e.preventDefault();token=$('token').value.trim();$('loginerror').textContent='';refresh()};
+$('logout').onclick=()=>{token='';model=null;lock()};
+$('langDe').onclick=()=>setLanguage('de');$('langEn').onclick=()=>setLanguage('en');
+$('peerSelect').onchange=()=>{if($('peerSelect').value){$('peer').value=$('peerSelect').value;rememberPeer();fingerprint='';render();tick()}else{syncSelect()}};
+$('peer').oninput=()=>{rememberPeer();syncSelect();fingerprint='';render();tick()};
+$('text').oninput=tick;$('newChat').onclick=()=>{$('peer').value='';$('peerSelect').value='';rememberPeer();fingerprint='';render();tick();$('peer').focus()};
+$('compose').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;tick();$('error').textContent='';try{await api('/api/send',{peer:currentPeer(),text:$('text').value});$('text').value='';await refresh()}catch(err){$('error').textContent=err.message}finally{busy=false;tick()}};
+$('peer').value=sessionStorage.getItem('paul-messenger-peer')||'';
+applyLanguage();if(token)refresh();setInterval(()=>{if(token)refresh()},1000);setInterval(tick,1000);
+</script>
+</body>
+</html>

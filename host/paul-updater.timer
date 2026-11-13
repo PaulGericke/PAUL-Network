@@ -1,0 +1,11 @@
+[Unit]
+Description=PAUL targeted update check
+
+[Timer]
+OnBootSec=120
+OnUnitActiveSec=60
+RandomizedDelaySec=15
+Unit=paul-updater.service
+
+[Install]
+WantedBy=timers.target

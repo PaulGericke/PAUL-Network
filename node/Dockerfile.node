@@ -1,0 +1,6 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --progress-bar off --no-cache-dir -r requirements.txt
+COPY protocol.py rtk.py messenger.py messenger_web.py messenger.html wifi_agent.py node.py ./
+CMD ["python", "-u", "node.py"]

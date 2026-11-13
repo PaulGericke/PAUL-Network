@@ -1,0 +1,10 @@
+[Unit]
+Description=PAUL single-container targeted application update
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/paul-node/paul_node.py check
+UMask=0077
+TimeoutStartSec=900
