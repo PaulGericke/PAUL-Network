@@ -15,6 +15,7 @@ Offenes Community-Funknetz auf LoRa-Basis. Vorhandene LoRa-Gateways senden signi
 | `node/` | PAUL-Node (läuft als Docker-Container auf dem Gateway): Beacons/Witnesses (`protocol.py`, `node.py`), Messenger (`messenger*.py`), Mesh-Weiterleitung (`mesh.py`), GNSS/RTK (`rtk.py`) |
 | `host/` | Host-Agent auf dem Gateway: zentrale Updates mit Rollback, WLAN-Hotspot, Hardware-Erkennung |
 | `tests/` | Tests für das Mesh |
+| `tools/crankk-lut-fix/` | Fix für zu laute Crankk-Gateways (Sendeleistungs-Tabelle), Anleitung: https://paulnetwork.io/lut |
 
 ## Tests
 
